@@ -24,6 +24,10 @@ for file in $csvFiles; do
         git add .
         git commit -m "$bugId:$(date):$branch:$devName:$priority:$desc"
         git push "$gitURL"
+        if [ $? -ne 0 ]; then
+            echo "Failed to push changes to $gitURL"
+            exit 1
+        fi
     fi
   done < "$file"
 done
