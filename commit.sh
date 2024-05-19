@@ -23,6 +23,7 @@ for file in $csvFiles; do
         # Make commit message according to CSV file format: BugID:CurrntDateTime:Branch Name:DevName:Priority:Excel Description
         git add .
         git commit -m "$bugId:$(date):$branch:$devName:$priority:$desc"
+        git push "$gitURL"
     fi
   done < "$file"
 done
