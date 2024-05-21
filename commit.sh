@@ -1,4 +1,10 @@
 #!/bin/bash
+devDesc=""
+#check if there Developer Additional Description
+if [ $# -eq 2 ]; then
+    devDesc=$2
+fi
+
 
 # Get the current branch
 currentBranch=$(git symbolic-ref --short HEAD)
@@ -22,7 +28,11 @@ for file in $csvFiles; do
     if [ "$branch" == "$currentBranch" ]; then
         # Make commit message according to CSV file format: BugID:CurrntDateTime:Branch Name:DevName:Priority:Excel Description
         git add .
-        git commit -m "$bugId:$(date):$branch:$devName:$priority:$desc"
+        if [ devDes == "" ]; then
+            git commit -m "$bugId:$(date):$branch:$devName:$priority:$desc"
+        else
+            git commit -m "$bugId:$(date):$branch:$devName:$priority:$desc:$devDesc"
+        fi
         git push "$gitURL"
         if [ $? -ne 0 ]; then
             echo "Failed to push changes to $gitURL"
