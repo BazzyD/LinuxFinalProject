@@ -27,16 +27,19 @@ for file in $csvFiles; do
   while IFS=',' read -r bugId desc branch devName priority gitURL; do
         if [ "$branch" == "$currentBranch" ]; then
 
-            # Stage changes
-            git add .
+            
             
             # Create commit message
             if [ -z "$devDesc" ]; then
-                commitMessage="$bugId:$(date):$branch:$devName:$priority:$desc"
+                commitMessage+="$bugId:$(date):$branch:$devName:$priority:$desc\n"
             else
-                commitMessage="$bugId:$(date):$branch:$devName:$priority:$desc:$devDesc"
+                commitMessage+="$bugId:$(date):$branch:$devName:$priority:$desc:$devDesc\n"
             fi
-
+           
+        fi
+    done < "$file"
+     # Stage changes
+            git add .
             # Commit the changes
             git commit -m "$commitMessage"
             gitURL="${gitURL//[[:space:]]/}" #clean the url
@@ -50,6 +53,4 @@ for file in $csvFiles; do
             else
                 echo "Changes pushed successfully to $gitURL"
             fi
-        fi
-    done < "$file"
 done
