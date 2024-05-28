@@ -1,10 +1,10 @@
 #!/bin/bash
-devDesc=""
-#check if there Developer Additional Description
-if [ $# -eq 2 ]; then
-    devDesc=$2
-fi
 
+# Check if there is a Developer Additional Description
+devDesc=""
+if [ $# -ge 1 ]; then
+    devDesc="${*:1}"
+fi
 
 # Get the current branch
 currentBranch=$(git symbolic-ref --short HEAD)
@@ -25,27 +25,31 @@ fi
 for file in $csvFiles; do
   # Read the CSV file line by line
   while IFS=',' read -r bugId desc branch devName priority gitURL; do
-    if [ "$branch" == "$currentBranch" ]; then
-        # Make commit message according to CSV file format: BugID:CurrntDateTime:Branch Name:DevName:Priority:Excel Description
-        git add .
-        if [ devDes == "" ]; then
-            git commit -m "$bugId:$(date):$branch:$devName:$priority:$desc"
-        else
-            git commit -m "$bugId:$(date):$branch:$devName:$priority:$desc:$devDesc"
+        if [ "$branch" == "$currentBranch" ]; then
+
+            # Stage changes
+            git add .
+            
+            # Create commit message
+            if [ -z "$devDesc" ]; then
+                commitMessage="$bugId:$(date):$branch:$devName:$priority:$desc\n"
+            else
+                commitMessage="$bugId:$(date):$branch:$devName:$priority:$desc:$devDesc"
+            fi
+
+            # Commit the changes
+            git commit -m "$commitMessage"
+            gitURL="${gitURL//[[:space:]]/}" #clean the url
+            # Push the changes
+            git push "$gitURL" "$currentBranch"
+            
+            # Check if the push was successful
+            if [ $? -ne 0 ]; then
+                echo "Failed to push changes to $gitURL"
+                exit 1
+            else
+                echo "Changes pushed successfully to $gitURL"
+            fi
         fi
-        git push "$gitURL"
-        if [ $? -ne 0 ]; then
-            echo "Failed to push changes to $gitURL"
-            exit 1
-        fi
-    fi
-  done < "$file"
+    done < "$file"
 done
-
-
-
-
-
-
-#add dev commit commit.sh {Developer Additional Description} 
-#formt BugID:CurrntDateTime:Branch Name:DevName:Priority:Excel Description:Dev Description
