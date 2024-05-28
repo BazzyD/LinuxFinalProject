@@ -31,7 +31,7 @@ for file in $csvFiles; do
             
             # Create commit message
             if [ -z "$devDesc" ]; then
-                commitMessage+="$bugId:$(date):$branch:$devName:$priority:$desc"
+                commitMessage+="$bugId:$(date):$branch:$devName:$priority:$desc \t"
             else
                 commitMessage+="$bugId:$(date):$branch:$devName:$priority:$desc:$devDesc \t"
             fi
